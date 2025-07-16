@@ -24,9 +24,10 @@ void QuickDialog(const wchar_t* msg) {
 }
 
 void ResultFail(HRESULT hr, const wchar_t* msg) {
-    _com_error err {hr};
-    auto* errMsg = (wchar_t*) err.ErrorMessage();
     if (FAILED(hr)) {
+        _com_error err {hr};
+        // tchar is a wchar_t because UNICODE is defined
+        auto* errMsg = (wchar_t*) err.ErrorMessage();
         QuickDialogFail(std::format(L"{}, HRESULT: {}", msg, errMsg).c_str());
         exit(1);
     }
@@ -63,7 +64,6 @@ public:
     HRESULT OnFileOk(IFileDialog* pfd) override {
         wchar_t* wMsg = nullptr;
 
-        //ascii is still contained, relax man itll work
         const HRESULT hr = pfd->GetFileName(&wMsg);
         ResultFail(hr, L"could not extract file name from file dialog");
 
